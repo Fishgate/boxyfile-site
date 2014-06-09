@@ -1,9 +1,7 @@
 /*
- * Author: Tyrone Stafford, Kyle Vermeulen, Fishgate
+ * Author: Kyle Vermeulen <kyle@source-lab.co.za>
  * Date: Created - 2012/09/05
- * Dependencies: validation.js (\\SERVER\aaa\Fishgate_Folder_Kyle_\libs\)
  * Description: Accordian slider and all form validation + AJAX POST request.
- * TODO:    - Finish off Ajax request once client approves copy and the PHP is done.
  * 
  */
 
@@ -54,6 +52,7 @@ function reset_order_form(){
     });
 
     $("#ordername").val("Name:");
+    $("#ordercompany").val("Company Name:");
     $("#ordernumber").val("Contact Number:");
     $("#orderemail").val("Email Address:");
     $("#orderaddress").val("Delivery Address:");
@@ -81,7 +80,7 @@ function show_related_step(){
 }
 
 //DOM READY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-$().ready(function() {
+$(document).ready(function() {
     // ACCORDIAN --------------------------------------------------------------------------------- tyrone
     $(".kwicks").kwicks({
         min : 104,
@@ -119,6 +118,7 @@ $().ready(function() {
     
     // clear form fields on focus, and default back when left empty
     clear_focus("ordername", "Name:");
+    clear_focus("ordercompany", "Company Name:");
     clear_focus("ordernumber", "Contact Number:");
     clear_focus("orderemail", "Email Address:");
     clear_focus("orderaddress", "Delivery Address:");
@@ -126,15 +126,14 @@ $().ready(function() {
     
     //validation-------------------------------------------------------------------------------------- kyle
     $(".submitbtn").click(function(){
-		console.log('submit');
 		
         validName =     validate("ordername", "Name:");
+        validCompanyName =     validate("ordercompany", "Company Name:");
         validNumber =   validate("ordernumber", "Contact Number:");
         validEmail =    validate_email("orderemail", "Email Address:");
         validAddress =  validate("orderaddress", "Delivery Address:");
         
-        if(validName && validNumber && validEmail && validAddress){
-			console.log('form valid');
+        if(validName && validCompanyName && validNumber && validEmail && validAddress){
 			
             // assume no products have being added until conditional check inside of the loop
             has_products = false;
@@ -145,19 +144,20 @@ $().ready(function() {
                     has_products = true;
                     return;
                 }
-            })
+            });
             
             if(has_products){
-				console.log('has_products');
+		
                 // form submit------------------------------------------------------------------- kyle
                 $.post("process.php", $("#orderform").serialize(), function(data){
-                    if(data == 'success'){
+                    result = data.trim();
+                    
+                    if(result == 'success'){
                         reset_order_form();
                         alert('Thank you. Your order is currently being processed. You will receive a confirmation email including payment details shortly.');
                     }
-                })
+                });
                 
-                //$("#orderform").submit(); //temp submit for dev
             }else{
                 // error 2
                 alert('Please add a product to your order before submiting your details.');
