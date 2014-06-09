@@ -10,21 +10,17 @@
  * 
  */
 
-//print_r($_POST);
-
 // DB connection-------------------------------------------------------------------------------
 require_once 'includes/mysqlcon.inc.php';
 
 // Setup array of all products and thier associated prices ------------------------------------
 $products = array (
-    'Small File'            => array( 'qty' => $_POST['Small_File'], 'price' => 10.00 ),
-    'Large File'            => array( 'qty' => $_POST['Large_File'], 'price' => 16.00 ),
-    'Small File Set'        => array( 'qty' => $_POST['Small_File_Set'], 'price' => 120.00 ),
-    'Large File Set'        => array( 'qty' => $_POST['Large_File_Set'], 'price' => 120.00 ),
+    'Small File'            => array( 'qty' => $_POST['Small_File'], 'price' => 14.50 ),
+    'Large File'            => array( 'qty' => $_POST['Large_File'], 'price' => 24.95 ),
+    'Small File Set'        => array( 'qty' => $_POST['Small_File_Set'], 'price' => 145.00 ),
+    'Large File Set'        => array( 'qty' => $_POST['Large_File_Set'], 'price' => 145.00 ),
     'Holder Box'            => array( 'qty' => $_POST['Holder_Box'], 'price' => 20.00 ),
-    'Document Holder Sheet' => array( 'qty' => $_POST['Document_Holder_Sheet'], 'price' => 0 ),
-    'Inside Folder'         => array( 'qty' => $_POST['Inside_Folder'], 'price' => 1.50 ),
-    'Temporary Divider'     => array( 'qty' => $_POST['Temporary_Divider'], 'price' => 1.00  )
+    'Document Holder Sheet' => array( 'qty' => $_POST['Document_Holder_Sheet'], 'price' => 0 )
 );
 
 // functions-----------------------------------------------------------------------------------
@@ -37,6 +33,8 @@ function generate_ref_number(){
 }
 
 function get_order_rows($products){
+    $order_rows = '';
+    
     foreach($products as $prod => $data){
         if($data['qty'] != 0){
             $this_total = $data['price'] * $data['qty'];
@@ -70,6 +68,8 @@ function get_grand_total($products){
 
 
 function get_order_summery($products){
+    $order_rows = '';
+    
     foreach($products as $prod => $data){
         if($data['qty'] != 0){
             $this_total = $data['price'] * $data['qty'];
@@ -203,8 +203,7 @@ $boxy_headers = "From: " . $_POST['Email_Address'] . "\r\n";
 $boxy_headers .= "Reply-To: " . $_POST['Email_Address'] . "\r\n";
 $boxy_headers .= "MIME-Version: 1.0\r\n";
 $boxy_headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-$boxy_to = 'order@boxyfile.co.za';
-//$boxy_to = 'tyrone@fishgate.co.za';
+$boxy_to = 'daan@boxyfile.co.za';
 $boxy_subject = 'Boxyfile Order Received – Ref #' . $ref;
 
 $boxy_message = '    
@@ -287,7 +286,8 @@ $boxy_message = '
 // DB query------------------------------------------------------------------------------------
 $query = 'INSERT INTO orders ( 
     ref, 
-    name, 
+    name,
+    company_name,
     contact_number, 
     email_address, 
     delivery_address, 
@@ -298,6 +298,7 @@ $query = 'INSERT INTO orders (
 ) VALUES ( 
     "#'.$ref.'", 
     "'.$_POST['Name'].'", 
+    "'.$_POST['Company_Name'].'", 
     "'.$_POST['Contact_Number'].'", 
     "'.$_POST['Email_Address'].'", 
     "'.$_POST['Delivery_Address'].'", 
@@ -310,9 +311,12 @@ $query = 'INSERT INTO orders (
 $result = mysql_query($query) or die(mysql_error());
 
 if($result){
-    mail($boxy_to, $boxy_subject, $boxy_message, $user_headers);
-    mail($user_to, $user_subject, $user_message, $boxy_headers);
-    echo 'success';
+    $boxymail = mail($boxy_to, $boxy_subject, $boxy_message, $user_headers);
+    $usermail = mail($user_to, $user_subject, $user_message, $boxy_headers);
+    
+    if($boxymail && $usermail){
+        echo 'success';
+    }
 }else{
     echo 'fail';
 }

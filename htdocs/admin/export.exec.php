@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once 'libs/classes/session.inc.php';
@@ -27,7 +28,7 @@ require_once '../includes/mysqlcon.inc.php';
  * execute sql query
  */
 
-$query = sprintf('SELECT ref, name, contact_number, email_address, delivery_address, order_summery, total, date FROM orders');
+$query = sprintf('SELECT ref, name, contact_number, email_address, delivery_address, order_summery, total, date FROM orders ORDER BY unix DESC');
 $result = mysql_query($query, $conn) or die(mysql_error($conn));
 
 /*
