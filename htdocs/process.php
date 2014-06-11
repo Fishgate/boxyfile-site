@@ -11,7 +11,7 @@
  */
 
 // DB connection-------------------------------------------------------------------------------
-require_once 'includes/mysqlcon.inc.php';
+//require_once 'includes/mysqlcon.inc.php';
 
 // Setup array of all products and thier associated prices ------------------------------------
 $products = array (
